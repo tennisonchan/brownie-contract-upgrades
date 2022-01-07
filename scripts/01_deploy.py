@@ -6,15 +6,25 @@ from brownie import (
     Contract,
     BoxV2,
 )
-from scripts.helpers import get_account, encode_function_data, GAS_LIMIT, upgrade_proxy
+from scripts.helpers import (
+    should_publish_source,
+    get_account,
+    encode_function_data,
+    GAS_LIMIT,
+    upgrade_proxy,
+)
 
 
 def deploy_proxy_box():
     account = get_account()
-    contract = Box.deploy({"from": account})
+    contract = Box.deploy(
+        {"from": account}, publish_source=should_publish_source(network.show_active())
+    )
     print(f"value: {contract.retrive()}")
 
-    proxy_admin = ProxyAdmin.deploy({"from": account})
+    proxy_admin = ProxyAdmin.deploy(
+        {"from": account}, publish_source=should_publish_source(network.show_active())
+    )
     initializer = contract.store, 1
     contract_encoded_initializer_function = encode_function_data(initializer)
 
@@ -23,6 +33,7 @@ def deploy_proxy_box():
         proxy_admin.address,
         contract_encoded_initializer_function,
         {"from": account, "gas_limit": GAS_LIMIT},
+        publish_source=should_publish_source(network.show_active()),
     )
     print(f"Proxy deployed to {proxy}, you can now upgrade to v2!")
     proxy_contract = Contract.from_abi(Box._name, proxy.address, Box.abi)
@@ -34,7 +45,9 @@ def deploy_proxy_box():
     # print(f"increment: {contract.increment()}")
 
     ## Update to BoxV2
-    box_v2 = BoxV2.deploy({"from": account})
+    box_v2 = BoxV2.deploy(
+        {"from": account}, publish_source=should_publish_source(network.show_active())
+    )
     upgrade_tx = upgrade_proxy(
         account,
         proxy,

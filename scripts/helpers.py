@@ -6,6 +6,10 @@ FORK_ENVIRONMENT = ["mainnet-fork-dev", "mainnet-fork"]
 GAS_LIMIT = 1000000
 
 
+def should_publish_source(active_network):
+    return config["networks"][active_network].get("verify", False)
+
+
 def is_development(active_network):
     return active_network in LOCAL_ENVIRONMENT
 

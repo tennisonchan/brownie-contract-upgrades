@@ -10,3 +10,7 @@ compiler:
 
 wallets:
   from_key: ${PRIVATE_KEY}
+
+networks:
+  rinkeby:
+    verify: true
